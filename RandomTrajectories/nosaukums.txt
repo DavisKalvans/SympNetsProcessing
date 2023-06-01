@@ -1,0 +1,7 @@
+Apstrādes skaitliskās metodes ar uz datiem balstītiem simplektiskiem neirona tīkliem.
+
+Skaitliskās metodes ar struktūru saglabājošu neirona tīkla apstrādi.
+
+Apstrādes skaitliskās metodes ar simplektiskiem neirona tīkliem.
+
+Simplektiskas skaitliskās metodes ar neirona tīkla apstrādi.

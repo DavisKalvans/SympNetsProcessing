@@ -1,0 +1,10 @@
+\begin{tabular}{rrrrrrrr}
+\toprule
+nL & nN & Avg Err at Tend & Std1 & Avg max abs HErr & Std2 & Abg max abs LErr & Std3 \\
+\midrule
+2 & 4 & 2.274E+00 & 5.137E+00 & 5.725E-01 & 1.085E+00 & 3.682E-02 & 1.442E-02 \\
+2 & 8 & 3.695E+00 & 6.176E+00 & 7.234E-01 & 1.465E+00 & 1.383E-02 & 1.442E-02 \\
+2 & 16 & 3.343E+00 & 5.984E+00 & 6.550E-01 & 1.392E+00 & 1.466E-02 & 1.442E-02 \\
+2 & 32 & 3.656E+00 & 5.987E+00 & 7.031E-01 & 1.399E+00 & 1.830E-02 & 1.442E-02 \\
+\bottomrule
+\end{tabular}

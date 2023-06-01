@@ -1,0 +1,7 @@
+\begin{tabular}{rrrr}
+\toprule
+Avg Err at Tend & Std1 & Avg max abs HErr & Std2 \\
+\midrule
+1.697E+00 & 7.896E+00 & 3.914E-01 & 1.181E+00 \\
+\bottomrule
+\end{tabular}
