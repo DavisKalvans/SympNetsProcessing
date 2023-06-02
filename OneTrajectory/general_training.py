@@ -308,7 +308,7 @@ def train_model(problem, method, device, data, trainParams, nL, nN, nM, extraPar
 
     ### Set up all parameters
 
-    learning_rate, batch_size, epochs, sch, eta1, eta2, linear = trainParams
+    learning_rate, batch_size, epochs, sch, eta1, eta2, linear, sigma = trainParams
     epochs_th = str(epochs/1000).replace('.0', '')
 
     gamma = np.exp(np.log(eta2/eta1)/epochs)
@@ -324,24 +324,19 @@ def train_model(problem, method, device, data, trainParams, nL, nN, nM, extraPar
     test_dataloader = DataLoader(testing_data, batch_size=batch_size)
 
     ### Create the model and train
+    # Set random seed to generate the same initial parameter values
+    torch.manual_seed(nM)
 
     layers = []
     for n in  range(nL):
         if linear:
-            layers.append(LinSympGradModule(d, nN, nL))
+            layers.append(LinSympGradModule(d, nN, nL, sigma))
         else:
-            layers.append(SympGradModule(d, nN, nL))
+            layers.append(SympGradModule(d, nN, nL, sigma))
 
     model = mySequential(*layers).to(device)
                         
-    # Set random seed to generate the same initial parameter values
-    torch.manual_seed(nM)
-    sigma = np.sqrt(0.01) # Does this being sqrt(0.01) ruin everything?
-    for param in model.parameters():
-        param.data = sigma*torch.randn(param.shape, dtype = torch.float64)
-
-    model = model.to(device)
-
+    
     # Initialize the loss function
     loss_fn = nn.MSELoss()
     
@@ -429,7 +424,7 @@ def model_errors(problem, method, device, data, trainParams, nL, nN, nM, predPar
     tm = np.linspace(0, Tend, M+1)
     Tend_txt = str(Tend).replace('.0', '')
 
-    learning_rate, batch_size, epochs, sch, eta1, eta2, linear = trainParams
+    learning_rate, batch_size, epochs, sch, eta1, eta2, linear, sigma = trainParams
     epochs_th = str(epochs/1000).replace('.0', '')
     if sch:
         learning_rate = eta1
@@ -800,7 +795,7 @@ def model_conv(problem, method, device,  data, trainParams, nL, nN, nM, convPara
     powers = np.arange(low_pow, upp_pow, dtype = np.float64)
     taus = 10**(-powers)
 
-    learning_rate, batch_size, epochs, sch, eta1, eta2, linear = trainParams
+    learning_rate, batch_size, epochs, sch, eta1, eta2, linear, sigma = trainParams
     epochs_th = str(epochs/1000).replace('.0', '')
     if sch:
         learning_rate = eta1
@@ -1256,7 +1251,7 @@ def model_multTrajectConv(problem, method, device,  data, trainParams, nL, nN, n
 
         ax.legend(loc=4, prop={'size':20})
         ax.grid(True)
-        ax.set_xlabel(r'$\h')
+        ax.set_xlabel(r'$h$')
         ax.set_ylabel('Lielākā leņķiskā relatīvā kļūda')
         ax.set_title(f"{problem} L={nL}, N={nN}, M={nM}")
 

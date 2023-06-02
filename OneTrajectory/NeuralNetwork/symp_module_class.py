@@ -66,7 +66,7 @@ class SympGradModule(nn.Module):
 
 # Symplctic gradient (Tanh) Module 
 class SympGradModuleTanh(nn.Module):
-    def __init__(self, d, n, L):
+    def __init__(self, d, n, L, sigma):
         super().__init__()
         """
         Weights: W, w and bias vector b
@@ -74,7 +74,6 @@ class SympGradModuleTanh(nn.Module):
         self.d = d
         self.D = 2*d
         self.L = L
-        sigma = np.sqrt(0.01)
         self.Wp = torch.nn.Parameter(sigma*torch.randn((n, d)))
         self.wp = torch.nn.Parameter(sigma*torch.randn((n, 1)))
         self.bp = torch.nn.Parameter(sigma*torch.zeros((1, n)))
@@ -124,7 +123,7 @@ class SympGradModuleTanh(nn.Module):
         return torch.cat((Q, P), 2), tau
 
 class LinSympGradModule(nn.Module):
-    def __init__(self, d, n, L):
+    def __init__(self, d, n, L, sigma):
         super().__init__()
         """
         Weights: W, w and bias vector b
@@ -132,7 +131,6 @@ class LinSympGradModule(nn.Module):
         self.d = d
         self.D = 2*d
         self.L = L
-        sigma = np.sqrt(0.01)
         self.Wp = torch.nn.Parameter(sigma*torch.randn((n, d)))
         self.wp = torch.nn.Parameter(sigma*torch.randn((n, 1)))
         self.bp = torch.nn.Parameter(sigma*torch.zeros((1, n)))
