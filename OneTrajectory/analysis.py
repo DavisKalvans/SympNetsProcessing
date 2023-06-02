@@ -7,25 +7,25 @@ import os
 method = 'Verlet'
 problem = 'Kepler'
 extraParams = 'None'
-if method == "Verlet":
-    sym = False
+if method == "Verlet": # symetric in the sense that h^2 is used (k=2)
+    sym = True
 else:
     sym = False
 
-sch = True
-linear = False
-best = False
+sch = True # Model with scheduling
+linear = False # Model with linear activation fucntions
+best = False # Model with lowest accuraccy during training (validation error)
 epochs = 50_000
-N_train = 320
-M_test = 100
-tau_model = 0.1
-tau = 0.1
+N_train = 320 # Training data
+M_test = 100 # Testing data
+tau_model = 0.1 # Time that was udes for training
+tau = 0.1 # Time step to use for predictions
 learning_rate = 1e-2
-eta1 = 1e-1
+eta1 = 1e-1 
 eta2 = 1e-3
-nL = [2, 4, 8]
-nN = [4, 32]
-nM = np.arange(0, 10) # CHANGE BACK TO 0, 10!!!!
+nL = [2, 4, 8] # List of layer counts used
+nN = [4, 32] # List of layer width used
+nM = np.arange(0, 10) # Amount of models for each layer and width combination
 
 ### Parameters for error predictions with multiple trajects
 area_Pendulum = np.array([[[-1.5, 2]], [[-1.5, 1.5]]]) # Same as area from training data
@@ -37,8 +37,8 @@ elif problem == "Kepler":
     area = area_Kepler
 
 seed = 0
-nr_trajects = 100
-if problem == 'Kepler':
+nr_trajects = 100 # How many trajectories to make predictions for
+if problem == 'Kepler': # Time of predictions
     Tend = 100
 elif problem == "Pendulum":
     Tend = 10
@@ -117,72 +117,73 @@ with open(name_kernel +'.txt', 'w') as f:
 ############################
 ### VPT for one model (best)
 ############################
-# if problem == "Kepler":
-#     Tend_vpt = 100
-# elif problem == "Pendulum":
-#     Tend_vpt = 2000
+if problem == "Kepler": # Prediction time for valid prediction time calculations
+    Tend_vpt = 100
+elif problem == "Pendulum":
+    Tend_vpt = 2000
 
-# treshold = 0.1
-# tau = 0.05
-# tau_txt = str(tau).replace('.', '')
-# tau_model_txt = str(tau_model).replace('.', '')
-# load_only_model = True
-# # Select specific model class
-# nL = 2
-# nN = 4
-# #nM = 1
-# nM = [0]
-# loss_acc_params = method, problem, sym, sch, linear, best, epochs, N_train, M_test, tau_model, learning_rate, eta1, eta2, nL, nN, nM, load_only_model
-# error_params = area, nr_trajects, seed, Tend, extraParams
+treshold = 0.1 # VPT treshold
+tau = 0.05 # Time step to use for predictions
+tau_txt = str(tau).replace('.', '')
+tau_model_txt = str(tau_model).replace('.', '')
+load_only_model = True
 
-# # Always check if long predictions are already calculated, otherwise calculate them
-# analytical_name = f'Analysis/VPT/{problem}Const{tau_txt}Tau_Seed{seed}nrTrajects{nr_trajects}_Tend{int(Tend_vpt)}_analytical.npz'
-# if not os.path.isfile(analytical_name):
-#     analytical_long(loss_acc_params, error_params, Tend_vpt, tau)
+# Select specific model class
+nL = 2 # Layers
+nN = 4 # Width
 
-# kernel_name = f'Analysis/VPT/{problem}Const{tau_txt}Tau_Seed{seed}nrTrajects{nr_trajects}_Tend{int(Tend_vpt)}_{method}.npz'
-# if not os.path.isfile(kernel_name):
-#     kernel_long(loss_acc_params, error_params, Tend_vpt, tau)
+nM = [0] # Either specific model or many ones (in that case, will calculate average VPT between them)
+loss_acc_params = method, problem, sym, sch, linear, best, epochs, N_train, M_test, tau_model, learning_rate, eta1, eta2, nL, nN, nM, load_only_model
+error_params = area, nr_trajects, seed, Tend, extraParams
 
-# epochs_th = str(epochs/1000).replace('.0', '')
-# if sch:
-#     learning_rate = eta1
-#     eta1_txt = str(np.log10(eta1)).replace('-', '').replace('.0', '')
-#     eta2_txt = str(np.log10(eta2)).replace('-', '').replace('.0', '')
-# else:
-#     eta1_txt = str(np.log10(learning_rate)).replace('-', '').replace('.0', '')
+# Always check if long predictions are already calculated, otherwise calculate them
+analytical_name = f'Analysis/VPT/{problem}Const{tau_txt}Tau_Seed{seed}nrTrajects{nr_trajects}_Tend{int(Tend_vpt)}_analytical.npz'
+if not os.path.isfile(analytical_name):
+    analytical_long(loss_acc_params, error_params, Tend_vpt, tau)
 
-# name = f'Analysis/VPT/{problem}Const{tau_txt}Tau_Seed{seed}nrTrajects{nr_trajects}_Tend{int(Tend_vpt)}'
-# if sch:
-#     name += '_sch'
+kernel_name = f'Analysis/VPT/{problem}Const{tau_txt}Tau_Seed{seed}nrTrajects{nr_trajects}_Tend{int(Tend_vpt)}_{method}.npz'
+if not os.path.isfile(kernel_name):
+    kernel_long(loss_acc_params, error_params, Tend_vpt, tau)
+
+epochs_th = str(epochs/1000).replace('.0', '')
+if sch:
+    learning_rate = eta1
+    eta1_txt = str(np.log10(eta1)).replace('-', '').replace('.0', '')
+    eta2_txt = str(np.log10(eta2)).replace('-', '').replace('.0', '')
+else:
+    eta1_txt = str(np.log10(learning_rate)).replace('-', '').replace('.0', '')
+
+name = f'Analysis/VPT/{problem}Const{tau_txt}Tau_Seed{seed}nrTrajects{nr_trajects}_Tend{int(Tend_vpt)}'
+if sch:
+    name += '_sch'
     
-# name += f'_Const{tau_model_txt}Tau{epochs_th}TH'
-# if best:
-#     name += '_best'
+name += f'_Const{tau_model_txt}Tau{epochs_th}TH'
+if best:
+    name += '_best'
 
-# if sch:
-#     name += f'_{eta1_txt}eta1_{eta2_txt}eta2'
-# else:
-#     name += f'_{eta1_txt}eta1'
+if sch:
+    name += f'_{eta1_txt}eta1_{eta2_txt}eta2'
+else:
+    name += f'_{eta1_txt}eta1'
 
 
-# name += f'_{nL}L{nN}n.npz'
+name += f'_{nL}L{nN}n.npz'
 
-# if not os.path.isfile(name):
-#     pred_long(loss_acc_params, error_params, Tend_vpt, tau)
+if not os.path.isfile(name):
+    pred_long(loss_acc_params, error_params, Tend_vpt, tau)
 
-# # Load them all up
-# analytical = np.load(analytical_name)
-# analytical = analytical['arr_0']
-# kernel = np.load(kernel_name)
-# kernel = kernel['arr_0']
-# model_pred = np.load(name)
-# model_pred = model_pred['arr_0']
+# Load them all up
+analytical = np.load(analytical_name)
+analytical = analytical['arr_0']
+kernel = np.load(kernel_name)
+kernel = kernel['arr_0']
+model_pred = np.load(name)
+model_pred = model_pred['arr_0']
 
-# c = vpt_calc(analytical, kernel, model_pred, nM, tau, Tend_vpt, treshold, nr_trajects, method)
-# print(c[2])
+c = vpt_calc(analytical, kernel, model_pred, nM, tau, Tend_vpt, treshold, nr_trajects, method)
+print(c[2])
 
-# c[2].to_latex(index=False,
-#                    formatters={"name": str.upper},
-#                    float_format="{:.2f}".format)
+c[2].to_latex(index=False,
+                   formatters={"name": str.upper},
+                   float_format="{:.2f}".format)
 
