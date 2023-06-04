@@ -12,7 +12,7 @@ if not os.path.exists(main_folder):
 methods = ['/Euler', '/Euler/diffTau', '/Euler/Sym', '/Verlet', '/Verlet/diffTau', '/Verlet/Sym', '/Verlet/Sym/diffTau']
 
 # All of dem problems
-problems = ['/HarmOsc', '/Kepler', '/Pendulum', '/DoublePendulum']
+problems = ['/HarmOsc', '/Kepler', '/Pendulum']
 
 # General folders for each problem
 folders = ['/ConvergenceGraphs', '/ConvergenceGraphs/Linear', '/ConvergenceGraphs/Sigmoid', '/MSE', '/Predictions', 
