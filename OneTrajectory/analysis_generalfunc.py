@@ -1,5 +1,8 @@
 import torch
 import numpy as np
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
 import pandas as pd
 from general_training import eulerStepNumpy_HarmOsc, eulerStepNumpy_Kepler, eulerStepNumpy_Pendulum, verletStep_HarmOsc, verletStep_Kepler, verletStep_Pendulum, verletStepNumpy_HarmOsc, verletStepNumpy_Kepler, verletStepNumpy_Pendulum
 from TrainingData.general_problems import HarmOsc, Pendulum, Kepler
@@ -9,12 +12,7 @@ import copy
 import multiprocessing
 from functools import partial
 
-'''
-method, problem, sym, sch, linear, best, N_train, M_test, tau_txt, eta1_txt, eta2_txt, nL, nN, nM
-training_type = (method, problem, sym, sch, linear, best, learning_rate, eta1_txt, eta2_txt)
-training_params = (nL, nN, nM, N_train, M_test, tau_txt)
-'''
-
+# Loads selected model and returns it. If load_only_model = False, then also returns model's loss and accuraccy during training
 def load_model(method, problem, sym, sch, linear, best, epochs, N_train, M_test, tau, learning_rate, eta1, eta2, nL, nN, nM, load_only_model = True):
     tau_txt = str(tau).replace('.', '')
     epochs_th = str(epochs/1000).replace('.0', '')
@@ -57,7 +55,8 @@ def load_model(method, problem, sym, sch, linear, best, epochs, N_train, M_test,
     else:
         model, loss, acc, *_ = torch.load(model_name)
         return model, loss, acc
-    
+
+# Calculates average loss and accuracy during training and returns a pandas table for avarages for every layer and width (nL, nN) combination
 def loss_acc_average(loss_acc_params):
     method, problem, sym, sch, linear, best, epochs, N_train, M_test, tau, learning_rate, eta1, eta2, nL, nN, nM, load_only_model = loss_acc_params
     loss_averages = []
@@ -114,6 +113,7 @@ def loss_acc_average(loss_acc_params):
 
     return loss_averages, loss_stds, acc_averages, acc_stds, df1
 
+# Selects the appropriate kernel and problem class for the selected problem
 def method_problem_select(method, problem):
     if method == 'Euler':
         if problem == 'HarmOsc':
@@ -139,6 +139,7 @@ def method_problem_select(method, problem):
 
     return numeric_stepNumpy, probl_class
 
+# Uses a model to make and return predictions from starting point x0 and time step tau until time Tend
 def model_predict_Tend(model, sym, x0, tau, Tend, numeric_stepNumpy, extraParams):
     device = 'cpu'
     d = len(x0)
@@ -167,6 +168,7 @@ def model_predict_Tend(model, sym, x0, tau, Tend, numeric_stepNumpy, extraParams
 
     return pred
 
+# Uses kernel to make and return predictions from starting point x0 and time step tau until time Tend
 def numeric_predict_Tend(x0, tau, Tend, numeric_stepNumpy, extraParams):
     d = len(x0)
     M = int(Tend/tau)
@@ -179,6 +181,7 @@ def numeric_predict_Tend(x0, tau, Tend, numeric_stepNumpy, extraParams):
 
     return pred_numeric
 
+# Uses high order verlet symplectic integrator to return ground truth from starting point x0 and time step tau until time Tend
 def analytical_pred_Tend(x0, tau, Tend, probl_class, extraParams):
     d = len(x0)
     D = int(d/2)
@@ -191,6 +194,7 @@ def analytical_pred_Tend(x0, tau, Tend, probl_class, extraParams):
 
     return exact
 
+# Generate nr_trajectories amount of starting points from area
 def generate_starting_points(area, seed, nr_trajects):
     D = len(area[0]) # Half dimension of problem
     x0 = []
@@ -209,6 +213,7 @@ def generate_starting_points(area, seed, nr_trajects):
 
     return x0
 
+# For Kepler, stable trajectories. Generate nr_trajectories amount of starting points from area
 def generate_starting_pointsKepler(seed, nr_trajects):
     np.random.seed(seed)
     x0 = []
@@ -224,6 +229,7 @@ def generate_starting_pointsKepler(seed, nr_trajects):
 
     return x0
 
+# Calculates all prediction errors and their standart deviation from the ground truth
 def error_calc(problem, M, d, exacts, predictions, nr_trajects, probl_class, extraParams):
     Err = np.zeros([M+1, 1])
     Err_Tend = []
@@ -263,6 +269,7 @@ def error_calc(problem, M, d, exacts, predictions, nr_trajects, probl_class, ext
     else:
         return Err, Err_std, HErr, HErr_std
 
+# Calculates error averages for kernel and processing methods, returns a pandas dataframe of the statistics
 def errors_average(loss_acc_params, error_params, tau):
     method, problem, sym, sch, linear, best, epochs, N_train, M_test, tau_model, learning_rate, eta1, eta2, nL, nN, nM, load_only_model = loss_acc_params
     area, nr_trajects, seed, Tend, extraParams = error_params
@@ -449,6 +456,7 @@ def errors_average(loss_acc_params, error_params, tau):
 
     return df_kernel, df_pred, df_pred_individuals
 
+# Does a single step of processing method
 def model_predict_oneStep(model, sym, x0, tau, numeric_stepNumpy, extraParams):
     device = 'cpu'
     d = len(x0)
@@ -473,12 +481,14 @@ def model_predict_oneStep(model, sym, x0, tau, numeric_stepNumpy, extraParams):
 
     return pred
 
+# Does a single step of kernel method
 def numeric_predict_oneStep(x0, tau, numeric_stepNumpy, extraParams):
     d = len(x0)
     pred_numeric = numeric_stepNumpy(x0, tau, extraParams)
 
     return pred_numeric
 
+# Does a single step of high order verlet method
 def analytical_pred_oneStep(x0, tau, probl_class, extraParams):
     d = len(x0)
     D = int(d/2)
@@ -487,6 +497,7 @@ def analytical_pred_oneStep(x0, tau, probl_class, extraParams):
 
     return exact
 
+# Calculates root mean normalized squared error of prediction
 def rmnse(exact, pred):
     square_error = np.square(exact -pred)
     mse = np.mean(square_error, axis=1)
@@ -498,6 +509,7 @@ def rmnse(exact, pred):
 
     return root_mean_normalized_square_error
 
+# Calculates VPT (valid prediction time) of a prediction with a specifief treshold
 def vpt(exact, pred, tau, treshold):
     
     rmnse_pred = rmnse(exact, pred)
@@ -510,11 +522,13 @@ def vpt(exact, pred, tau, treshold):
 
     return VPT
 
-def expand_array(arr, new_shape): # Because why would numpy have this built in
+# Because why would numpy have this built in
+def expand_array(arr, new_shape): 
     expanded_arr = np.zeros(new_shape, dtype=arr.dtype)
     expanded_arr[:arr.shape[0], :arr.shape[1]] = arr
     return expanded_arr
 
+# Used for VPT, same as analytical_pred_Tend, but the results are saved to a .npz file for later use.
 def analytical_long(loss_acc_params, error_params, Tend, tau):
 
     method, problem, sym, sch, linear, best, epochs, N_train, M_test, _, learning_rate, eta1, eta2, nL, nN, nM, load_only_model = loss_acc_params
@@ -536,7 +550,8 @@ def analytical_long(loss_acc_params, error_params, Tend, tau):
     
     np.savez(f'Analysis/VPT/{problem}Const{tau_txt}Tau_Seed{seed}nrTrajects{nr_trajects}_Tend{int(Tend)}_analytical', exacts)
     return 'analytical done'
-        
+
+# Used for VPT, same as numeric_predict_Tend, but the results are saved to a .npz file for later use.       
 def kernel_long(loss_acc_params, error_params, Tend, tau):
     method, problem, sym, sch, linear, best, epochs, N_train, M_test, _, learning_rate, eta1, eta2, nL, nN, nM, load_only_model = loss_acc_params
     area, nr_trajects, seed, _, extraParams = error_params
@@ -559,6 +574,7 @@ def kernel_long(loss_acc_params, error_params, Tend, tau):
     np.savez(f'Analysis/VPT/{problem}Const{tau_txt}Tau_Seed{seed}nrTrajects{nr_trajects}_Tend{int(Tend)}_{method}', kernels)
     return 'kernel done'
 
+# Used for VPT, same as model_predict_Tend, but the results are saved to a .npz file for later use.
 def pred_long(loss_acc_params, error_params, Tend, tau):
     method, problem, sym, sch, linear, best, epochs, N_train, M_test, tau_model, learning_rate, eta1, eta2, nL, nN, nM, load_only_model = loss_acc_params
     area, nr_trajects, seed, _, extraParams = error_params
@@ -610,6 +626,7 @@ def pred_long(loss_acc_params, error_params, Tend, tau):
     np.savez(name, pred_all)
     return 'model done'
 
+# Calculates the VPT values for kerenl and processing methods, returns a pandas dataframe with statistics
 def vpt_calc(analytical, kernel, model_pred, nM, tau, Tend, treshold, nr_trajects, method):
     vpt_kernels = []
     for i in range(nr_trajects):
