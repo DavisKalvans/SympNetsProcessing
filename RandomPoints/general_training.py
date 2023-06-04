@@ -535,7 +535,7 @@ def model_errors(problem, method, device, data, trainParams, nL, nN, nM, predPar
 
     # Plots global error
     fig1, ax = plt.subplots(figsize=(9, 6.5))
-    ax.plot(tm, Err, ls='-', color='k', linewidth='1', label='New method') 
+    ax.plot(tm, Err, ls='-', color='r', linewidth='1', label='New method') 
     ax.plot(tm, Err_numeric, ls='-', color='g', linewidth='1', label=f'{method} method') 
     ax.legend(loc=1, prop={'size':20})
     ax.set_xlabel("time")
@@ -546,7 +546,7 @@ def model_errors(problem, method, device, data, trainParams, nL, nN, nM, predPar
 
     # Plots Hamiltonian error
     fig2, ax = plt.subplots(figsize=(9, 6.5))
-    ax.plot(tm, HErr, ls='-', color='k', linewidth='1', label='New method') 
+    ax.plot(tm, HErr, ls='-', color='r', linewidth='1', label='New method') 
     ax.plot(tm, HErr_numeric, ls='-', color='g', linewidth='1', label=f'{method} method') 
     ax.legend(loc=1, prop={'size':20})
     ax.set_xlabel("time")
@@ -558,7 +558,7 @@ def model_errors(problem, method, device, data, trainParams, nL, nN, nM, predPar
     # Plots Angular error if it's the Kepler problem
     if problem == 'Kepler':
         fig3, ax = plt.subplots(figsize=(9, 6.5))
-        ax.plot(tm, LErr, ls='-', color='k', linewidth='1', label='New method') 
+        ax.plot(tm, LErr, ls='-', color='r', linewidth='1', label='New method') 
         ax.plot(tm, LErr_numeric, ls='-', color='g', linewidth='1', label=f'{method} method') 
         ax.legend(loc=1, prop={'size':20})
         ax.set_xlabel("time")
@@ -952,7 +952,7 @@ def model_conv(problem, method, device,  data, trainParams, nL, nN, nM, convPara
 
     ax.legend(loc=4, prop={'size':20})
     ax.grid(True)
-    ax.set_xlabel(r'$\tau$')
+    ax.set_xlabel(r'$h$')
     ax.set_ylabel('Aboslute error')
     ax.set_title(f"{problem} L={nL}, N={nN}, M={nM}")
 
@@ -977,7 +977,7 @@ def model_conv(problem, method, device,  data, trainParams, nL, nN, nM, convPara
 
     ax.legend(loc=4, prop={'size':20})
     ax.grid(True)
-    ax.set_xlabel(r'$\tau$')
+    ax.set_xlabel(r'$h$')
     ax.set_ylabel('Max Hamiltonian error')
     ax.set_title(f"{problem} L={nL}, N={nN}, M={nM}")
 
@@ -997,7 +997,7 @@ def model_conv(problem, method, device,  data, trainParams, nL, nN, nM, convPara
 
         ax.legend(loc=4, prop={'size':20})
         ax.grid(True)
-        ax.set_xlabel(r'$\tau$')
+        ax.set_xlabel(r'$h$')
         ax.set_ylabel('Max angular error')
         ax.set_title(f"{problem} L={nL}, N={nN}, M={nM}")
 
@@ -1256,7 +1256,7 @@ def model_multTrajectConv(problem, method, device,  data, trainParams, nL, nN, n
 
         ax.legend(loc=4, prop={'size':20})
         ax.grid(True)
-        ax.set_xlabel(r'$\h')
+        ax.set_xlabel(r'$h$')
         ax.set_ylabel('Lielākā leņķiskā relatīvā kļūda')
         ax.set_title(f"{problem} L={nL}, N={nN}, M={nM}")
 
