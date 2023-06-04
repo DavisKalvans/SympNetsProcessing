@@ -8,24 +8,24 @@ method = 'Verlet'
 problem = 'Kepler'
 extraParams = 'None'
 if method == "Verlet": # symetric in the sense that h^2 is used (k=2)
-    sym = True
+    sym = False # For OneTrajectory, only the nonsymetrical models were used (k=1)
 else:
     sym = False
 
 sch = True # Model with scheduling
 linear = False # Model with linear activation fucntions
 best = False # Model with lowest accuraccy during training (validation error)
-epochs = 50_000
+epochs = 1_000 # Only use thousands here
 N_train = 320 # Training data
 M_test = 100 # Testing data
 tau_model = 0.1 # Time that was udes for training
 tau = 0.1 # Time step to use for predictions
 learning_rate = 1e-2
-eta1 = 1e-1 
-eta2 = 1e-3
-nL = [2, 4, 8] # List of layer counts used
-nN = [4, 32] # List of layer width used
-nM = np.arange(0, 10) # Amount of models for each layer and width combination
+eta1 = 1e-1  # For scheduling (starting learning rate)
+eta2 = 1e-3 # For scheduling (ending learning rate)
+nL = [2] # List of layer counts used
+nN = [4] # List of layer width used
+nM = np.arange(0, 2) # Amount of models for each layer and width combination
 
 ### Parameters for error predictions with multiple trajects
 area_Pendulum = np.array([[[-1.5, 2]], [[-1.5, 1.5]]]) # Same as area from training data
@@ -37,7 +37,7 @@ elif problem == "Kepler":
     area = area_Kepler
 
 seed = 0
-nr_trajects = 100 # How many trajectories to make predictions for
+nr_trajects = 1 # How many trajectories to make predictions for
 if problem == 'Kepler': # Time of predictions
     Tend = 100
 elif problem == "Pendulum":
@@ -47,7 +47,7 @@ elif problem == "Pendulum":
 #################################################
 ### Loss and acc averages and standart deviations
 #################################################
-load_only_model = False
+load_only_model = False 
 tau_txt = str(tau).replace('.', '')
 epochs_th = str(epochs/1000).replace('.0', '')
 name = f'Analysis/MSE_Acc/{method}{problem}RandN{N_train}M{M_test}Const{tau_txt}Tau{epochs_th}TH'
@@ -55,10 +55,10 @@ if best:
     name = name +'_best'
 
 loss_acc_params = method, problem, sym, sch, linear, best, epochs, N_train, M_test, tau_model, learning_rate, eta1, eta2, nL, nN, nM, load_only_model
-#model, loss, acc = load_model(method, problem, sym, sch, linear, best, epochs, N_train, M_test, tau, learning_rate, eta1, eta2, nL, nN, nM, load_only_model)
 a = loss_acc_average(loss_acc_params)
 
 dataframe = a[4]
+print("Table for average loss and accuracy for models")
 print(dataframe)
 dataframe.to_csv(name+'.csv', index = False)
 
@@ -67,7 +67,7 @@ dataframe_latex = dataframe.to_latex(index=False,
                   formatters={"name": str.upper},
                   float_format="{:.3E}".format,
 )
-print(dataframe_latex)
+
 with open(name +'.txt', 'w') as f:
     f.write(dataframe_latex)
 
@@ -78,8 +78,12 @@ load_only_model = True
 loss_acc_params = method, problem, sym, sch, linear, best, epochs, N_train, M_test, tau_model, learning_rate, eta1, eta2, nL, nN, nM, load_only_model
 error_params = area, nr_trajects, seed, Tend, extraParams
 b = errors_average(loss_acc_params, error_params, tau)
+print("Table for kenrel method's average prediction errors")
+print(b[0])
+print("Table for processing method's average prediction errors")
+print(b[1])
 
-#Save everything
+# Save everything
 tau_txt = str(tau).replace('.', '')
 epochs_th = str(epochs/1000).replace('.0', '')
 name = f'Analysis/Errors/{method}{problem}RandN{N_train}M{M_test}Const{tau_txt}Tau{epochs_th}TH_Seed{seed}nrTrajects{nr_trajects}_Tend{int(Tend)}'
@@ -181,9 +185,11 @@ model_pred = np.load(name)
 model_pred = model_pred['arr_0']
 
 c = vpt_calc(analytical, kernel, model_pred, nM, tau, Tend_vpt, treshold, nr_trajects, method)
+print('Average VPT table for kernel and processing methods')
 print(c[2])
 
-c[2].to_latex(index=False,
-                   formatters={"name": str.upper},
-                   float_format="{:.2f}".format)
+# Use this for getting LaTeX code for the VPT table
+#c[2].to_latex(index=False,
+#                   formatters={"name": str.upper},
+#                   float_format="{:.2f}".format)
 
