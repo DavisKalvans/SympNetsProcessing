@@ -1,5 +1,6 @@
 import numpy as np
 import copy
+### Implements the eight order verlet symplectic intergator, using multiple trimple jump methods
 
 # Triple jump coefficients (Hairier 4.4)
 def gen_gamma(p):
@@ -10,6 +11,7 @@ def gen_gamma(p):
 
     return gamma
 
+# Fourth order method (3 jumps)
 def fourth_order(x0, tau, D, gamma, problem, extraParams):
     tau_half = tau/2
 
@@ -30,6 +32,7 @@ def fourth_order(x0, tau, D, gamma, problem, extraParams):
 
     return np.concatenate((Q, P))
 
+# Sixth order method (9 jumps)
 def sixth_order(x0, tau, D, gamma2, gamma4, problem, extraParams):
     # First time
     tau1 = tau*gamma4[0]
@@ -45,6 +48,7 @@ def sixth_order(x0, tau, D, gamma2, gamma4, problem, extraParams):
 
     return x3
 
+# Eight order method (27 jumps)
 def eight_order(x0, tau, D, gamma2, gamma4, gamma6, problem, extraParams):
     # First time
     tau1 = tau*gamma6[0]
@@ -58,6 +62,7 @@ def eight_order(x0, tau, D, gamma2, gamma4, gamma6, problem, extraParams):
 
     return x3
 
+# Returns one step result for arbitrary tau, using much smaller step sizes to guarantee accuraccy
 def eight_orderPrecise(x0, tau, D, problem, extraParams):
     TAU = 0.01
     tau_new = copy.deepcopy(tau) # Need to do this, since otherwise it changes the outside variable tau

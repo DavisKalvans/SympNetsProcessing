@@ -1,4 +1,8 @@
 import numpy as np
+### Classes with problems that contain all necessary functions.
+### .problem for solve_ivp, .H for calculating Hamiltonian energy
+### .H_q and .H_p for verlet8.eightOrderPrecise
+
 
 class HarmOsc():
     def problem(t, y, omega): # Problem for odesolvers 
@@ -41,6 +45,7 @@ class Pendulum():
     def H_p(x, extraParams = None):
         return np.sin(x)
 
+# Not used atm, mitgh not be totally correct too
 class Lennard_Jones():
     def V_prim(r):
         a1 = -12*(0.341/r)**12/r
@@ -144,6 +149,7 @@ class Kepler():
         f[1] = x[1]/d
         return f
     
+# Not a separable Hamiltonian system, would need to use implicit solvers
 class DoublePendulum():
     def problem(t, z):
         g = 1
