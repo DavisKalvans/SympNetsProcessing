@@ -57,7 +57,7 @@ convParamsMult = (10, 0, 5, dim, area, 0, 10, False) # Tend, lower power, upper 
 # Loop trough combinations of layer count and their width
 for nL in [2]: # Layers
     for nN in [4]: # Width
-        for nM in [0, 1]: # Seeds to use
+        for nM in [0]: # Seeds to use
             # Train model
             general_training.train_model(problem, method, device, data, trainParams, nL, nN, nM, extraParams)
             # Calculate and plot prediction errors for one specific trajectory x0

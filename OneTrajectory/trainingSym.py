@@ -14,6 +14,8 @@ nN = 4 # Width of each layer
 nM = 0 # Seed for model parameter initialization
 epochs = 1_000 # Only use thousands here
 extraParams = None # Extra parameters for problems that need it, eg, HarmOsc has omega; None by default
+
+### Areas for mult predictions/convergence; starting points for one trajectory prediction/convergence
 x0_HarmOsc = (0.3, 0.5)
 x0_Pendulum = (0.8, 0.5)
 e = 0.6
@@ -56,9 +58,9 @@ convParamsMult = (10, 0, 5, dim, area, 0, 10, False) # Tend, lower power, upper 
 #seed, nr of trajectories, use the best model or not
 
 # Loop trough combinations of layer width
-for nL in [2]:
-    for nN in [4]:
-        for nM in [0, 1]:
+for nL in [2]: # Layers
+    for nN in [4]: # Width
+        for nM in [0, 1]: # Seeds to use
             # Train model
             general_trainingVerlSym.train_model(problem, method, device, data, trainParams, nL, nN, nM, extraParams)
             # Calculate and plot prediction errors for one specific trajectory x0
