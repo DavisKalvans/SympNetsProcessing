@@ -1,3 +1,5 @@
 # SympNetsProcessing
 
-Mazliet vēl pēc nodošanas tiks veikta uzkope, lai sagatavotu mazu instrukciju piedāvāto failu lieošanai, kā arī lai atbrīvotos no šādām tādām kļūdām, kas parādījās divas versijas apvienojot. Šie uzlabojumi sagaidāmi līdz sestdienas vakaram.
+Iekļauti visi nepieciešamie kodi, lai pēc maģistra darba ``Simplektiskas skaitliskās metodes ar struktūru saglabājošu neirona tīkla apstrādi'' aprakstītās metodes, varētu trenēt un veikt skaitlisku kļūdu analīzi apstrādes metodēm, kas veiktas balstoties un simplektisku gradienta neironu tīkla apstrādi.
+
+# Python vides uzstādīšana
