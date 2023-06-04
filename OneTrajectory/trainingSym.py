@@ -2,8 +2,6 @@ import general_trainingVerlSym
 import numpy as np
 import torch
 
-torch.backends.cuda.matmul.allow_tf32 = False
-
 ### HarmOsc Verlet settings
 problem = 'Kepler'
 method = 'Verlet'
@@ -14,7 +12,7 @@ tau = 0.1 # Time step
 nL = 2 # Layers
 nN = 4 # Width of each layer
 nM = 0 # Seed for model parameter initialization
-epochs = 50_000
+epochs = 1_000 # Only use thousands here
 extraParams = None # Extra parameters for problems that need it, eg, HarmOsc has omega; None by default
 x0_HarmOsc = (0.3, 0.5)
 x0_Pendulum = (0.8, 0.5)
@@ -31,12 +29,12 @@ area_Kepler = np.array([[[-1.5, 1.5], [-1.5, 1.5]], [[-1, 1], [-1, 1]]]) # Same 
 # and area[1] is all min and max values of each p coordinate.
 # E.g. for Kepler q1 [-1.5, 1.5]; q2 [-1.5, 1.5]; p1 [-1, 1]; p2 [-1, 1].
 
-linear = False
+linear = False # Use a linear activation function
 learning_rate = 1e-2
 sigma = 1 # Parameter initialization weights
-sch = False
-eta1 = 1e-1
-eta2 = 1e-3
+sch = False # Use scheduling for learning rate
+eta1 = 1e-1 # For scheduling (starting learning rate)
+eta2 = 1e-3 # For scheduling (ending learning rate)
 
 if problem == "Kepler":
     x0 = x0_Kepler
@@ -60,12 +58,16 @@ convParamsMult = (10, 0, 5, dim, area, 0, 10, False) # Tend, lower power, upper 
 # Loop trough combinations of layer width
 for nL in [2]:
     for nN in [4]:
-        for nM in [0]:
+        for nM in [0, 1]:
+            # Train model
             general_trainingVerlSym.train_model(problem, method, device, data, trainParams, nL, nN, nM, extraParams)
-            #general_trainingVerlSym.model_predictions(problem, method, device, data, trainParams, nL, nN, nM, predParams, extraParams)
-            #general_trainingVerlSym.model_errors(problem, method, device, data, trainParams, nL, nN, nM, plotParams, extraParams)
-            #general_trainingVerlSym.model_conv(problem, method, device, data, trainParams, nL, nN, nM, convParams, extraParams)
+            # Calculate and plot prediction errors for one specific trajectory x0
+            general_trainingVerlSym.model_errors(problem, method, device, data, trainParams, nL, nN, nM, plotParams, extraParams)
+            # Calculate and plot prediction error convergence for one specific trajectory x0
+            general_trainingVerlSym.model_conv(problem, method, device, data, trainParams, nL, nN, nM, convParams, extraParams)
+            # Calculate and plot prediction error average for many trajectories
             general_trainingVerlSym.model_multTrajectErrors(problem, method, device, data, trainParams, nL, nN, nM, predParamsMult, extraParams)
+            # Calculate and plot prediction error convergence average for many trajectories
             general_trainingVerlSym.model_multTrajectConv(problem, method, device, data, trainParams, nL, nN, nM, convParamsMult, extraParams)
 
             # Do everything with best model too
