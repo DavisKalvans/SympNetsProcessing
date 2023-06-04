@@ -38,3 +38,18 @@ for method in methods:
             if not os.path.exists(folder):
                 print(folder)
                 os.mkdir(folder)
+
+
+### Analysis folder
+current_dir = os.getcwd()
+if not os.path.exists(main_folder + '/Analysis'):
+    os.mkdir(main_folder)
+
+if not os.path.exists(main_folder + '/Analysis/Errors'):
+    os.mkdir(main_folder)
+
+if not os.path.exists(main_folder + '/Analysis/MSE_Acc'):
+    os.mkdir(main_folder)
+
+if not os.path.exists(main_folder + '/Analysis/VPT'):
+    os.mkdir(main_folder)
