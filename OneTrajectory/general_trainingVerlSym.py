@@ -532,7 +532,7 @@ def model_errors(problem, method, device, data, trainParams, nL, nN, nM, plotPar
     tm = np.linspace(0, Tend, M+1)
     Tend_txt = str(Tend).replace('.0', '')
 
-    learning_rate, batch_size, epochs, sch, eta1, eta2, linear = trainParams
+    learning_rate, batch_size, epochs, sch, eta1, eta2, linear, sigma = trainParams
     epochs_th = str(epochs/1000).replace('.0', '')
     if sch:
         learning_rate = eta1
@@ -1058,7 +1058,7 @@ def model_conv(problem, method, device,  data, trainParams, nL, nN, nM, convPara
     powers = np.arange(low_pow, upp_pow, dtype = np.float64)
     taus = 10**(-powers)
 
-    learning_rate, batch_size, epochs, sch, eta1, eta2, linear = trainParams
+    learning_rate, batch_size, epochs, sch, eta1, eta2, linear, sigma = trainParams
     epochs_th = str(epochs/1000).replace('.0', '')
     if sch:
         learning_rate = eta1
