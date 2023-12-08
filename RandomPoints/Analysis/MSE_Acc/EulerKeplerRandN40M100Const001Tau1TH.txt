@@ -1,0 +1,7 @@
+\begin{tabular}{rrrrrr}
+\toprule
+ nL &  nN &  Loss average &  Loss std &  Acc average &   Acc std \\
+\midrule
+  2 &   4 &     1.428E-09 & 8.757E-11 &    2.768E-06 & 9.809E-08 \\
+\bottomrule
+\end{tabular}
